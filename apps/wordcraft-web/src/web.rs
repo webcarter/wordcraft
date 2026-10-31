@@ -39,6 +39,18 @@ pub fn start() {
             log::error!("no unsaved-changes guard: {e}");
         }
         let mut options = eframe::WebOptions::default();
+        // Keep the requested texture size within older mobile GPU / WebGL limits.
+        if let eframe::egui_wgpu::WgpuSetup::CreateNew(setup) = &mut options.wgpu_options.wgpu_setup {
+            let default_descriptor = std::sync::Arc::clone(&setup.device_descriptor);
+            setup.device_descriptor = std::sync::Arc::new(move |adapter| {
+                let mut descriptor = default_descriptor(adapter);
+                descriptor.required_limits.max_texture_dimension_2d =
+                    descriptor.required_limits.max_texture_dimension_2d
+                        .min(adapter.limits().max_texture_dimension_2d)
+                        .min(4096);
+                descriptor
+            });
+        }
         if query().contains("webgl")
             && let eframe::egui_wgpu::WgpuSetup::CreateNew(create) = &mut options.wgpu_options.wgpu_setup
         {
