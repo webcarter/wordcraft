@@ -5,6 +5,7 @@ on:
     paths:
       - 'app/**'
       - '*.gradle'
+      - 'gradle.properties'
       - 'settings.gradle'
       - '.github/workflows/android-apk.yml'
   workflow_dispatch:
