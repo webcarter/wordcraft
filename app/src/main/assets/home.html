@@ -1,0 +1,11 @@
+<!doctype html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101827"><title>ArtCraft</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#101827;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+main{width:min(520px,100%)}h1{font-size:34px;margin:0 0 8px}p{color:#b9c4d4;margin:0 0 28px}.app{display:block;width:100%;padding:22px;margin:14px 0;border:1px solid #34445d;border-radius:16px;background:#1b2a40;color:white;text-align:left;font-size:21px;font-weight:700}.app span{display:block;font-size:13px;font-weight:400;color:#b9c4d4;margin-top:7px}.foot{font-size:12px;color:#8e9db2;margin-top:24px}
+</style></head><body><main><h1>ArtCraft</h1><p>Your creative workspace. Choose an app to continue.</p>
+<button class="app" onclick="openApp('wordcraft')">WordCraft<span>Documents and writing</span></button>
+<button class="app" onclick="openApp('gridcraft')">GridCraft<span>Spreadsheets and calculations</span></button>
+<button class="app" onclick="openApp('deckcraft')">DeckCraft<span>Presentations and slides</span></button>
+<div class="foot">Works offline using the apps included in this installation.</div></main>
+<script>function openApp(name){location.href='/assets/apps/'+name+'/index.html';}</script></body></html>
