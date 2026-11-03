@@ -1,0 +1,73 @@
+name: Build ArtCraft Android APK
+on:
+  push:
+    branches: [artcraft-android]
+    paths:
+      - 'app/**'
+      - '*.gradle'
+      - 'settings.gradle'
+      - '.github/workflows/android-apk.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Android wrapper
+        uses: actions/checkout@v4
+        with:
+          path: android
+      - name: Checkout WordCraft source
+        uses: actions/checkout@v4
+        with:
+          repository: webcarter/wordcraft
+          ref: mobile-compat
+          path: sources/wordcraft
+      - name: Checkout GridCraft source
+        uses: actions/checkout@v4
+        with:
+          repository: webcarter/gridcraft
+          ref: mobile-compat
+          path: sources/gridcraft
+      - name: Checkout DeckCraft source
+        uses: actions/checkout@v4
+        with:
+          repository: webcarter/deckcraft
+          ref: mobile-compat
+          path: sources/deckcraft
+      - name: Install Rust and WebAssembly target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Install Trunk and Binaryen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y binaryen
+          cargo install trunk --locked
+      - name: Build all three web apps
+        run: |
+          for app in wordcraft gridcraft deckcraft; do
+            (cd "sources/$app/apps/$app-web" && trunk build --release)
+            mkdir -p "android/app/src/main/assets/apps/$app"
+            cp -R "sources/$app/dist/web/." "android/app/src/main/assets/apps/$app/"
+          done
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build APK
+        working-directory: android
+        run: gradle --no-daemon assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArtCraft-Android-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
